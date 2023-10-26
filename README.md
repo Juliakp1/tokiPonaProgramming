@@ -1,4 +1,4 @@
-# tokiPonaProgramming
+# Programming in Toki Pona
 
 What is toki pona?
 - 
@@ -13,3 +13,7 @@ How does it look like?
 There are two ways to view this language, the first one is using the romanization, and the second one is using toki pona's logography. Both can be seen below:
 
 ![Sample code in both views](./assets/sampleCode_compare.png "Sample code in both views")
+
+Want to know more?
+- 
+More details on how this works will be in the .ipynb in the main directory, follow alongside it!

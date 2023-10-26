@@ -1,0 +1,38 @@
+O objetivo deste projeto é propiciar ao aluno a oportunidade de projetar, implementar e testar sua própria linguagem de programação interpretada. 
+Para isto, cada aluno individualmente ou em duplas (vocês escolhem as duplas) deverá:
+    definir a finalidade de sua linguagem de programação
+    definir uma gramática livre de contexto (GLC) para esta gramática
+    implementar um analisador léxico para esta linguagem
+    implementar um analisador sintático para esta linguagem
+    implementar um gerador de tabela de símbolos para esta linguagem
+    implementar um decorador de tipos para esta linguagem
+    implementar um verificador de tipos para esta linguagem
+    implementar um intepretador (executor) de programas escritos nesta linguagem
+Esta linguagem deve obedecer algumas características mínimas:
+    possuir, no mínimo, 2 tipos
+    possuir um comando de atribuição
+    possuir um comando condicional 
+    possuir um comando de repetição 
+    possuir uma característica de modularização ou orientação a objetos ou funcional
+
+O projeto deve ser entregue até 05/12, no formato de um notebook Python e conter:
+descrição das principais características da linguagem
+exemplos de programas escritos na linguagem e células para execução do programa
+implementações dos analisadores léxico, sintático, gerador da tabela de símbolos, decorador de tipos, verificador de tipos e executor de programas.
+
+A avaliação será feita com base na seguinte rubrica:
+
+E
+	O projeto tem somente a documentação da linguagem e não implementa nenhum analisador ou todos os analisadores não funcionam
+D
+	O projeto possui documentação da linguagem e implementa corretamente o analisador léxico 
+C
+	O projeto possui documentação da linguagem e implementa corretamente os analisadores léxicos e sintático 
+B-, B e B+	
+    O projeto possui documentação da linguagem e implementa corretamente os analisadores léxicos e sintático, assim como o gerador da tabela de símbolos (B-)
+    O projeto possui documentação da linguagem e implementa corretamente os analisadores léxicos e sintático, assim como o decorador de tipos (B)
+    O projeto possui documentação da linguagem e implementa corretamente os analisadores léxicos e sintático, assim como o verificador de tipos (B+)
+A-,A e A+	
+    O projeto possui documentação e implementa o executor com funcionamento parcial (A-)
+    O projeto possui documentação da linguagem e implementa o executor completamente (A)
+    O projeto possui documentação da linguagem, implementa o executor completamente e a linguagem é criativa (A+)

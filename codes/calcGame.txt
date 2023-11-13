@@ -1,0 +1,48 @@
+nanpa [_nanpa_wan] 
+nanpa [_nanpa_tu] 
+nanpa [_nanpa_lon] 
+nanpa [_nanpa_pi_jan] 
+nanpa [_lete]
+nanpa [_pona_toki]
+
+[_nanpa_wan] sama tu
+[_nanpa_tu] sama wan
+[_nanpa_lon] sama tu wan
+
+toki "toki! sina ken ala ken toki e nasin pi nanpa?\n"
+
+[_pona_toki] sama wan
+[_lete] sama wan
+awen la ([_lete] sama sama wan) ni
+
+    toki "seme?\n"
+    toki [_nanpa_wan] 
+    toki "en" 
+    toki [_nanpa_tu] 
+    toki "\n"
+
+    kute [_nanpa_pi_jan]
+
+    la ([_nanpa_pi_jan] sama sama [_nanpa_lon]) ni
+    
+        toki "sina pana e nanpa pona a :D \n"
+        [_pona_toki] sama [_pona_toki] en wan
+
+        [_nanpa_wan] sama [_nanpa_wan] namako tu wan
+        [_nanpa_tu] sama [_nanpa_tu] ala en tu 
+        [_nanpa_wan] sama [_nanpa_wan] ala en [_nanpa_tu]
+        [_nanpa_tu] sama [_nanpa_tu] en [_nanpa_wan]  
+
+        [_nanpa_lon] sama [_nanpa_wan] en [_nanpa_tu]
+
+    ante la
+        [_lete] sama tu
+        [_pona_toki] sama [_pona_toki] ala en wan
+    pini
+
+pini
+
+toki "\n"
+toki "pona a! sina ken toki e nasin pi nanpa a! nanpa lon:"
+toki [_pona_toki]
+toki "\n"

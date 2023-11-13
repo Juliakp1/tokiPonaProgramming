@@ -1,3 +1,11 @@
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
+#
+# This is the code runner for the toki pona programming language, please run it before reading it!
+#
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
+
 import os
 
 from rply import LexerGenerator
@@ -339,9 +347,9 @@ def expression_binop(p):
     else:
         raise AssertionError('Oops, this should not be possible!')
 
-@pg.error
-def error_handler(token):
-    raise ValueError("Ran into a %s where it wasn't expected" % token.gettokentype())
+# @pg.error
+# def error_handler(token):
+#     raise ValueError("Ran into a %s where it wasn't expected" % token.gettokentype())
 
 parser = pg.build()
 
@@ -627,13 +635,15 @@ ST={}
 def run_code(codeString):
   variables={} # resets the variables
   ST={} # resets the symbol table
-
+  
+  print("")
   lexy=lexer.lex(codeString)
   arvore=parser.parse(lexy)
   arvore.accept(SymbolTable())
   arvore.accept(Decorator())
   arvore.accept(TypeVerifier())
   arvore.accept(Eval())
+  print("")
 
 # -------------------------------------------- #
 
@@ -648,18 +658,18 @@ while True:
 
   inp = input(">> ")
 
-  if inp == "exit":
+  if inp == "exit" or inp == "quit":
     break
 
   elif inp == "help":
-    print("type \"help\" for help (you are here)")
-    print("type \"exit\" to exit")
-    print("type \"simple\" to run the simplelest addition code")
-    print("type \"array\" to run the array testing code")
-    print("type \"string\" to run the sring testing code")
-    print("type \"if\" to run the if/while testing code")
-    print("type \"input\" to run the input/output testing code")
-    print("type \"custom\" to run your own custom code")
+    print("Type \"help\" for help (you are here)")
+    print("Type \"exit\" or \"quit\" to exit")
+    print("Type \"simple\" to run the simplelest addition code")
+    print("Type \"array\" to run the array testing code")
+    print("Type \"string\" to run the sring testing code")
+    print("Type \"if\" to run the if/while testing code")
+    print("Type \"input\" to run the input/output testing code")
+    print("Type \"custom\" to run your own custom code")
 
   elif inp == "simple":
     run_code(simpleTesting)

@@ -637,6 +637,10 @@ def run_code(codeString):
   ST={} # resets the symbol table
   
   print("")
+  print("Code about to be run:")
+  print(codeString)
+  print("")
+  print("")
   lexy=lexer.lex(codeString)
   arvore=parser.parse(lexy)
   arvore.accept(SymbolTable())

@@ -640,6 +640,7 @@ def run_code(codeString):
   print("Code about to be run:")
   print(codeString)
   print("")
+  print("---------------------------------------------------")
   print("")
   lexy=lexer.lex(codeString)
   arvore=parser.parse(lexy)

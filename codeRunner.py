@@ -1,8 +1,8 @@
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
-#
-# This is the code runner for the toki pona programming language, please run it before reading it!
-#
+#                                                                                                             #
+#       This is the code runner for the toki pona programming language, please run it before reading it!      #
+#                                                                                                             #
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
@@ -15,6 +15,8 @@ lg.add('WORDS', r'\"[a-zA-Z_ \\\(\)\?\!\:]+\"')   # no limitations for the lette
 lg.add('INT', r'nanpa')
 lg.add('STR', r'nimi')
 lg.add('ARR', r'kulupu')
+lg.add('FUNCT', r'pali')
+lg.add('RETURN', r'kama')
 lg.add('WHILE', r'awen la')
 lg.add('ELSE', r'ante la')
 lg.add('IF', r'la')
@@ -86,6 +88,26 @@ class Attribution(BaseBox):
 
     def accept(self, visitor):
         return visitor.visit_attribution(self)
+
+# ------------------------------------------- #
+
+class Function(BaseBox):
+    def __init__(self, id, param, expr, ret):
+        self.id = id
+        self.param = param
+        self.expr = expr
+        self.ret = ret
+
+    def accept(self, visitor):
+        return visitor.visit_function(self)
+
+class CallFunction(BaseBox):
+    def __init__(self, id, param):
+        self.id = id
+        self.param = param
+
+    def accept(self, visitor):
+        return visitor.visit_callfunction(self)
 
 # ------------------------------------------- #
 
@@ -179,7 +201,7 @@ pg = ParserGenerator(
      'WHILE', 'IF', 'ELSE', 'THEN', 'END', 
      'ID', 'SIMPLE', 'NEG',
      'WORDS',
-     'INT', 'STR', 'ARR',
+     'INT', 'STR', 'ARR', 'FUNCT', 'RETURN',
      'OPEN_PARENS', 'CLOSE_PARENS', 
      'PRINT', 'INPUT'
     ],
@@ -200,8 +222,14 @@ def program(p):
 @pg.production('declarations : declaration')
 def declarations(p):
     return Declarations(p[0],None)
-
 @pg.production('declarations : declaration declarations')
+def declarations(p):
+    return Declarations(p[0],p[1])
+
+@pg.production('declarations : function')
+def declarations(p):
+    return Declarations(p[0],None)
+@pg.production('declarations : function declarations')
 def declarations(p):
     return Declarations(p[0],p[1])
 
@@ -216,6 +244,10 @@ def declaration_integer(p):
 @pg.production('declaration : ARR ID')
 def declaration_integer(p):
     return Declaration(p[1].getstr(), "arr")
+
+@pg.production('function : FUNCT ID OPEN_PARENS ID CLOSE_PARENS THEN commands RETURN expression END')
+def declaration_function(p):
+    return Function(p[1].getstr(), p[3].getstr(), p[6], p[8])
 
 # ------------------------------------------- #
 # Commands (anything that isnt a declaration)
@@ -316,6 +348,10 @@ def expression_id(p):
 def expression_id(p):
     return String(p[0].getstr())
 
+@pg.production('expression : FUNCT ID OPEN_PARENS expression CLOSE_PARENS')
+def expression_function(p):
+    return CallFunction(p[1].getstr(), p[3])
+
 @pg.production('expression : SIMPLE')
 def compounds_compound(p):
     return Compounds(p[0],None, 1)
@@ -357,6 +393,7 @@ parser = pg.build()
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
 ST={}
+functions={}
 
 class Visitor(object):
   pass
@@ -364,6 +401,7 @@ class Visitor(object):
 class SymbolTable(Visitor):
     def visit_program(self, prog):
         prog.decls.accept(self)
+        prog.cmmds.accept(self)
 
     def visit_declarations(self, d):
         d.decl.accept(self)
@@ -372,6 +410,16 @@ class SymbolTable(Visitor):
 
     def visit_declaration(self, d):
         ST[d.id]=d.tp
+
+    def visit_function(self, d):
+        ST[d.id]='int'
+        ST[d.param]='int'
+        functions[d.id]=d
+        
+    def visit_attribution(self, d):
+      pass
+    def visit_commands(self, d):
+      pass
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
@@ -435,6 +483,13 @@ class Decorator(Visitor):
           i.decor_type=ST[i.value]
         else:
           raise AssertionError('id not declared')
+    
+    def visit_callfunction(self, i):
+        if i.id in ST:
+          i.decor_type=ST[i.id]
+        else:
+          raise AssertionError('id not declared')
+        i.param.accept(self)
 
     def visit_add(self, a):
         a.left.accept(self)
@@ -577,6 +632,14 @@ class Eval(Visitor):
   def visit_string(self,var):
     value = var.value[1:-1]
     return value
+
+  def visit_callfunction(self,var):
+    if var.id not in functions:
+      raise AssertionError('function uninitialized')
+    func = functions[var.id]
+    variables[func.param] = var.param.accept(self)
+    func.expr.accept(self)
+    return func.ret.accept(self)
   
   def visit_compounds(self,number):
     value = str(number.simple)
@@ -627,6 +690,7 @@ testArray = "kulupu [_kulupu] [_kulupu] (wan) sama luka wan [_kulupu] (tu) sama 
 testString = "nimi [_kulupu] nimi [_nanpa] nimi [_kulupu_nanpa] [_kulupu] sama \"kulupu\" [_nanpa] sama \"nanpa\" [_kulupu_nanpa] sama [_kulupu] en \" \" en [_nanpa] toki [_kulupu_nanpa]"
 testIfsWhiles = "nanpa [_lete] nanpa [_luka_sike] [_lete] sama wan [_luka_sike] sama wan awen la ([_lete] sama sama wan) ni la ([_luka_sike] sama sama luka luka) ni [_lete] sama tu ante la toki [_luka_sike] [_luka_sike] sama [_luka_sike] en wan pini pini"
 testInput = "nanpa [_nanpa] nimi [_sitelen] toki \"input a number\" kute [_nanpa] toki \"\\n\" toki [_nanpa] toki \"\\ninput a string\" kute [_sitelen] toki \"\\n\" toki [_sitelen]"
+testFunction = testArray = "nanpa [_nanpa] \npali [_ma_en_wan] ([_nanpa]) ni \n[_nanpa] sama [_nanpa] en wan \ntoki [_nanpa] \nkama [_nanpa] \npini \n[_nanpa] sama wan \n[_nanpa] sama pali [_ma_en_wan] ([_nanpa])"
 
 # makes them global (hopefully)
 variables={} 
@@ -674,6 +738,7 @@ while True:
     print("Type \"string\" to run the sring testing code")
     print("Type \"if\" to run the if/while testing code")
     print("Type \"input\" to run the input/output testing code")
+    print("Type \"function\" to run the function testing code")
     print("Type \"custom\" to run your own custom code")
 
   elif inp == "simple":
@@ -686,6 +751,8 @@ while True:
     run_code(testIfsWhiles)
   elif inp == "input":
     run_code(testInput)
+  elif inp == "function":
+    run_code(testFunction)
 
   elif inp == "custom":
      # this will take a txt, turn it into a string, and run it

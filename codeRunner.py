@@ -92,9 +92,8 @@ class Attribution(BaseBox):
 # ------------------------------------------- #
 
 class Function(BaseBox):
-    def __init__(self, id, param, expr, ret):
+    def __init__(self, id, expr, ret):
         self.id = id
-        self.param = param
         self.expr = expr
         self.ret = ret
 
@@ -102,9 +101,8 @@ class Function(BaseBox):
         return visitor.visit_function(self)
 
 class CallFunction(BaseBox):
-    def __init__(self, id, param):
+    def __init__(self, id):
         self.id = id
-        self.param = param
 
     def accept(self, visitor):
         return visitor.visit_callfunction(self)
@@ -245,9 +243,9 @@ def declaration_integer(p):
 def declaration_integer(p):
     return Declaration(p[1].getstr(), "arr")
 
-@pg.production('function : FUNCT ID OPEN_PARENS ID CLOSE_PARENS THEN commands RETURN expression END')
+@pg.production('function : FUNCT ID THEN commands RETURN expression END')
 def declaration_function(p):
-    return Function(p[1].getstr(), p[3].getstr(), p[6], p[8])
+    return Function(p[1].getstr(), p[3], p[5])
 
 # ------------------------------------------- #
 # Commands (anything that isnt a declaration)
@@ -348,9 +346,9 @@ def expression_id(p):
 def expression_id(p):
     return String(p[0].getstr())
 
-@pg.production('expression : FUNCT ID OPEN_PARENS expression CLOSE_PARENS')
+@pg.production('expression : FUNCT ID')
 def expression_function(p):
-    return CallFunction(p[1].getstr(), p[3])
+    return CallFunction(p[1].getstr())
 
 @pg.production('expression : SIMPLE')
 def compounds_compound(p):
@@ -413,7 +411,6 @@ class SymbolTable(Visitor):
 
     def visit_function(self, d):
         ST[d.id]='int'
-        ST[d.param]='int'
         functions[d.id]=d
         
     def visit_attribution(self, d):
@@ -489,7 +486,6 @@ class Decorator(Visitor):
           i.decor_type=ST[i.id]
         else:
           raise AssertionError('id not declared')
-        i.param.accept(self)
 
     def visit_add(self, a):
         a.left.accept(self)
@@ -637,7 +633,6 @@ class Eval(Visitor):
     if var.id not in functions:
       raise AssertionError('function uninitialized')
     func = functions[var.id]
-    variables[func.param] = var.param.accept(self)
     func.expr.accept(self)
     return func.ret.accept(self)
   
@@ -685,12 +680,12 @@ class Eval(Visitor):
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
 # Pre coded snippets, avaliable in the ipynb 
-simpleTesting = "nanpa [_nanpa_wan] nanpa [_nanpa_tu] nanpa [_nanpa_tu_wan] [_nanpa_wan] sama luka wan [_nanpa_tu] sama tu [_nanpa_tu_wan] sama [_nanpa_wan] en [_nanpa_tu] toki [_nanpa_tu_wan]"
-testArray = "kulupu [_kulupu] [_kulupu] (wan) sama luka wan [_kulupu] (tu) sama tu [_kulupu] (wan tu) sama [_kulupu] (tu) en [_kulupu] (wan) toki [_kulupu]"
-testString = "nimi [_kulupu] nimi [_nanpa] nimi [_kulupu_nanpa] [_kulupu] sama \"kulupu\" [_nanpa] sama \"nanpa\" [_kulupu_nanpa] sama [_kulupu] en \" \" en [_nanpa] toki [_kulupu_nanpa]"
-testIfsWhiles = "nanpa [_lete] nanpa [_luka_sike] [_lete] sama wan [_luka_sike] sama wan awen la ([_lete] sama sama wan) ni la ([_luka_sike] sama sama luka luka) ni [_lete] sama tu ante la toki [_luka_sike] [_luka_sike] sama [_luka_sike] en wan pini pini"
-testInput = "nanpa [_nanpa] nimi [_sitelen] toki \"input a number\" kute [_nanpa] toki \"\\n\" toki [_nanpa] toki \"\\ninput a string\" kute [_sitelen] toki \"\\n\" toki [_sitelen]"
-testFunction = testArray = "nanpa [_nanpa] \npali [_ma_en_wan] ([_nanpa]) ni \n[_nanpa] sama [_nanpa] en wan \ntoki [_nanpa] \nkama [_nanpa] \npini \n[_nanpa] sama wan \n[_nanpa] sama pali [_ma_en_wan] ([_nanpa])"
+simpleTesting = "nanpa [_nanpa_wan] \nnanpa [_nanpa_tu] \nnanpa [_nanpa_tu_wan] \n[_nanpa_wan] sama luka wan \n[_nanpa_tu] sama tu \n[_nanpa_tu_wan] sama [_nanpa_wan] en [_nanpa_tu] \ntoki [_nanpa_tu_wan]"
+testArray = "kulupu [_kulupu] \n[_kulupu] (wan) sama luka wan \n[_kulupu] (tu) sama tu \n[_kulupu] (wan tu) sama [_kulupu] (tu) en [_kulupu] (wan) \ntoki [_kulupu]"
+testString = "nimi [_kulupu] \nnimi [_nanpa] \nnimi [_kulupu_nanpa] \n[_kulupu] sama \"kulupu\" \n[_nanpa] sama \"nanpa\" \n[_kulupu_nanpa] sama [_kulupu] en \" \" en [_nanpa] \ntoki [_kulupu_nanpa]"
+testIfsWhiles = "nanpa [_lete] \nnanpa [_luka_sike] \n[_lete] sama wan \n[_luka_sike] sama wan \nawen la ([_lete] sama sama wan) ni \n  la ([_luka_sike] sama sama luka luka) ni \n   [_lete] sama tu \n  ante la \n    toki [_luka_sike] \n    [_luka_sike] sama [_luka_sike] en wan \n  pini \npini"
+testInput = "nanpa [_nanpa] \nnimi [_sitelen] \ntoki \"input a number\" \nkute [_nanpa] \ntoki [_nanpa] \ntoki \"\\n\" \ntoki \"\\ninput a string\" \nkute [_sitelen] \ntoki [_sitelen] \ntoki \"\\n\""
+testFunction = "nanpa [_nanpa] \npali [_ma_en_wan] ni \n  [_nanpa] sama [_nanpa] en wan \n  toki [_nanpa] \n  kama [_nanpa] \npini \n[_nanpa] sama wan \n[_nanpa] sama pali [_ma_en_wan]"
 
 # makes them global (hopefully)
 variables={} 
@@ -702,6 +697,7 @@ def run_code(codeString):
   
   print("")
   print("Code about to be run:")
+  print("")
   print(codeString)
   print("")
   print("---------------------------------------------------")
